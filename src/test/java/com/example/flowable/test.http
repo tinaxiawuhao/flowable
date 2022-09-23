@@ -1,0 +1,27 @@
+POST http://localhost:8080/flowable/flow/start
+Content-Type: application/json
+
+{
+  "processDefinitionKey": "Leave",
+  "variables": {
+    "leaveTask": "zhangsan"
+  }
+}
+
+###
+GET http://localhost:8080/flowable/flow/tasks?assignee=zhangsan
+Accept: application/json
+
+###
+GET http://localhost:8080/flowable/flow/historyTasks?assignee=1
+Accept: application/json
+
+###
+PUT http://localhost:8080/flowable/flow/reject?taskId=ac262f9b-3b1c-11ed-84bf-b23cdc95944e
+Accept: application/json
+
+###
+PUT http://localhost:8080/flowable/flow/pass?taskId=ac262f9b-3b1c-11ed-84bf-b23cdc95944e
+Accept: application/json
+
+###
