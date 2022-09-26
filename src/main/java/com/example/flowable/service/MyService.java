@@ -2,10 +2,12 @@ package com.example.flowable.service;
 
 import com.example.flowable.entity.CurrentTask;
 import com.example.flowable.entity.StartProcess;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
+import com.example.flowable.entity.SysGroup;
+import com.example.flowable.entity.SysUser;
+import org.flowable.engine.*;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.idm.api.GroupQuery;
+import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ import java.util.List;
 
 @Service
 public class MyService {
+
+    @Autowired
+    private IdentityService identityService;
 
     @Autowired
     private RuntimeService runtimeService;
@@ -34,7 +39,6 @@ public class MyService {
         return processInstance.getId();
     }
 
-    @Transactional
     public List<CurrentTask> getTasks(String assignee) {
         List<CurrentTask> list = new ArrayList<>();
         List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).orderByTaskCreateTime().desc().list();
@@ -64,4 +68,37 @@ public class MyService {
         });
         return result;
     }
+
+    public void saveUser(SysUser user) {
+        identityService.saveUser(user);
+    }
+
+    public void saveGroup(SysGroup group) {
+        identityService.saveGroup(group);
+    }
+
+    public void createMembership(String userId,String groupId) {
+        identityService.createMembership(userId,groupId);
+    }
+
+    //切换执行人
+    public void claim(String assignee) {
+        //获取对应的组成员
+        User user = identityService.createUserQuery().memberOfGroup("XXX").userDisplayName("xxx").singleResult();
+        List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).orderByTaskCreateTime().desc().list();
+        tasks.forEach(item -> {
+            taskService.claim(item.getId(),user.getId());
+        });
+
+    }
+
+    //置空执行人
+    public void unclaim(String assignee) {
+        List<Task> tasks = taskService.createTaskQuery().taskAssignee(assignee).orderByTaskCreateTime().desc().list();
+        tasks.forEach(item -> {
+            taskService.unclaim(item.getId());
+        });
+
+    }
+
 }

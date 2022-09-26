@@ -2,8 +2,8 @@ package com.example.flowable.controller;
 
 import com.example.flowable.entity.CurrentTask;
 import com.example.flowable.entity.StartProcess;
+import com.example.flowable.entity.SysUser;
 import com.example.flowable.service.MyService;
-import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,5 +65,15 @@ public class FlowController {
     public List<CurrentTask> historyTasks(@RequestParam String assignee) {
         return myService.getHistoryTasks(assignee);
     }
+
+    /**
+     * 创建用户
+     * @param user
+     */
+    @RequestMapping(value = "/createUser", method = RequestMethod.POST)
+    public void createUser(@RequestBody SysUser user) {
+        myService.saveUser(user);
+    }
+
 
 }
